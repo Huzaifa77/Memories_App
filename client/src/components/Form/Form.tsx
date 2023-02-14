@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import ReactImageFileToBase64 from "react-file-image-to-base64";
 import { useDispatch } from "react-redux";
 import { PostStateInterface } from "../../interfaces/post_interface";
-import { sendPostsThunk } from "../../reducers/sendPostsSlice";
+import { sendPostsThunk } from "../../reducers/postSlice";
 import type { AppDispatch } from "../../store/store";
 
 const Form = () => {

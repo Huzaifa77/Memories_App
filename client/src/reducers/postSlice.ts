@@ -1,4 +1,4 @@
-import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
+import { createAsyncThunk, createSlice, PayloadAction } from "@reduxjs/toolkit";
 import * as api from "../api";
 import { PostsState, PostStateInterface } from "../interfaces/post_interface";
 import type { RootState } from "../store/store";
@@ -16,6 +16,19 @@ export const getPosts = createAsyncThunk<PostStateInterface[]>(
     return data as PostStateInterface[];
   }
 );
+
+export const sendPostsThunk = createAsyncThunk(
+  "send/insertPost",
+  async (post: PostStateInterface) => {
+    try{
+        const { data } = await api.insertPost(post);
+        return data;
+    }catch(err:any){
+        return err.message
+    } 
+  }
+);
+
 
 const fetchAllPostSlice = createSlice({
   name: "posts",
@@ -36,7 +49,14 @@ const fetchAllPostSlice = createSlice({
       .addCase(getPosts.rejected, (state, action) => {
         state.loading = "error",
         state.error = action.error.message;
-      });
+      })
+      .addCase(sendPostsThunk.fulfilled,
+        (state, action:PayloadAction<PostStateInterface>) => {
+          const newPost = action.payload
+          console.log('new one ',newPost,'state is',state.posts)
+          state.posts.push(action.payload)
+        }
+      );
   },
 });
 
