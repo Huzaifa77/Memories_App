@@ -1,27 +1,55 @@
 import moment from "moment";
-import React from "react";
+import React, { useState } from "react";
+import { useDispatch } from "react-redux";
 import { PostStateInterface } from "../../../interfaces/post_interface";
+import { deletePostThunk, likePostThunk } from "../../../reducers/postSlice";
+import type { AppDispatch } from "../../../store/store";
 
-const Post = (props: PostStateInterface): JSX.Element => {
-  // console.log("sliced ", props.tags);
+type postTypes = {
+  post:PostStateInterface,
+  setCurrentId: React.Dispatch<React.SetStateAction<string>>
+}
+
+const Post: React.FC<postTypes> = ({post,setCurrentId}) => {
+  const [showEdit, setShowEdit] = useState(false);
+
+  const dispatch:AppDispatch = useDispatch();
+
+  const handleClick = () => {
+    setShowEdit(!showEdit);
+  };
+
+  const handleEdit = (id:string) => {
+    setCurrentId(id)
+    setShowEdit(!showEdit);
+  }
+
+  const handleLike = (id:string) => {
+    dispatch(likePostThunk(id));
+  }
+
+  const handleDelete = (id:string) => {
+    dispatch(deletePostThunk(id))
+  }
+
   return (
     <div className="bg-white rounded-lg md:w-2/5 w-2/5 mx-5 mb-2 ">
       <div className="relative z-0">
         <img
           className="w-fit h-auto mb-3 shadow-lg rounded-lg"
-          src={props.selectedFile}
+          src={post.selectedFile}
           alt="selected image"
         />
         <div className="absolute inset-0 flex flex-col justify-start items-start z-10 text-white p-2">
-          <div>{props.creator}</div>
-          <div>{moment(props.createdAt).fromNow()}</div>
+          <div>{post.creator}</div>
+          <div>{moment(post.createdAt).fromNow()}</div>
         </div>
         <div className="absolute inset-0 flex justify-end items-start z-10">
-          <button
+          {!showEdit && <button
             id="dropdownButton"
-            data-dropdown-toggle="dropdown"
             className="inline-block text-white rounded-lg text-sm p-1.5 cursor-pointer"
             type="button"
+            onClick={() => handleClick()}
           >
             <span className="sr-only">Open dropdown</span>
             <svg
@@ -33,42 +61,32 @@ const Post = (props: PostStateInterface): JSX.Element => {
             >
               <path d="M6 10a2 2 0 11-4 0 2 2 0 014 0zM12 10a2 2 0 11-4 0 2 2 0 014 0zM16 12a2 2 0 100-4 2 2 0 000 4z"></path>
             </svg>
-          </button>
-          <div
-            id="dropdown"
-            className="z-10 hidden text-base list-none bg-white divide-y divide-gray-100 rounded-lg shadow w-44 dark:bg-gray-700"
-          >
-            <ul className="py-2" aria-labelledby="dropdownButton">
-              <li>
-                <a
-                  href="#"
-                  className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 dark:hover:bg-gray-600 dark:text-gray-200 dark:hover:text-white"
-                >
-                  Edit{" "}
-                </a>
-              </li>
-            </ul>
-          </div>
+          </button>}
+          {showEdit && (
+            <button id="dropdown" className="z-10 h-10 mt-2 bg-white rounded-lg w-40" onClick={() => handleEdit(post._id!)}>
+              Edit{" "}
+            </button>
+          ) }
         </div>
       </div>
 
       <div className="mx-2 my-2 ">
         <span className="text-sm text-gray-500 dark:text-gray-400">
-          #{props.tags}
+          #{post.tags}
         </span>
       </div>
 
       <div className="flex flex-col items-start px-4">
         <h5 className="mb-1 text-xl font-medium text-gray-900 dark:text-white">
-          {props.title}
+          {post.title}
         </h5>
         <span className="text-md text-gray-500 dark:text-gray-400">
-          {props.message}
+          {post.message}
         </span>
 
         <div className="grid grid-cols-2 gap-10 mt-2 mb-2">
           <div>
-            <button className="flex hover:text-blue-500">
+            <button onClick={() => handleLike(post._id!)} className="flex hover:text-blue-500">
               <svg
                 xmlns="http://www.w3.org/2000/svg"
                 viewBox="0 0 24 24"
@@ -78,11 +96,11 @@ const Post = (props: PostStateInterface): JSX.Element => {
                 <path d="M7.493 18.75c-.425 0-.82-.236-.975-.632A7.48 7.48 0 016 15.375c0-1.75.599-3.358 1.602-4.634.151-.192.373-.309.6-.397.473-.183.89-.514 1.212-.924a9.042 9.042 0 012.861-2.4c.723-.384 1.35-.956 1.653-1.715a4.498 4.498 0 00.322-1.672V3a.75.75 0 01.75-.75 2.25 2.25 0 012.25 2.25c0 1.152-.26 2.243-.723 3.218-.266.558.107 1.282.725 1.282h3.126c1.026 0 1.945.694 2.054 1.715.045.422.068.85.068 1.285a11.95 11.95 0 01-2.649 7.521c-.388.482-.987.729-1.605.729H14.23c-.483 0-.964-.078-1.423-.23l-3.114-1.04a4.501 4.501 0 00-1.423-.23h-.777zM2.331 10.977a11.969 11.969 0 00-.831 4.398 12 12 0 00.52 3.507c.26.85 1.084 1.368 1.973 1.368H4.9c.445 0 .72-.498.523-.898a8.963 8.963 0 01-.924-3.977c0-1.708.476-3.305 1.302-4.666.245-.403-.028-.959-.5-.959H4.25c-.832 0-1.612.453-1.918 1.227z" />
               </svg>
 
-              <p className=" ml-1 inline">Like</p>
+              <p className=" ml-1 inline">{post.likeCount}</p>
             </button>
           </div>
           <div>
-            <button className="flex hover:text-red-600">
+            <button onClick={() => handleDelete(post._id!)} className="flex hover:text-red-600">
               <svg
                 xmlns="http://www.w3.org/2000/svg"
                 viewBox="0 0 24 24"
@@ -95,7 +113,6 @@ const Post = (props: PostStateInterface): JSX.Element => {
                   clipRule="evenodd"
                 />
               </svg>
-
               <p className="ml-1 inline">Delete</p>
             </button>
           </div>

@@ -8,3 +8,12 @@ export const fetchPosts = () => axios.get(url);
 
 export const insertPost = (post: PostStateInterface) =>
   axios.post<PostStateInterface>(`${url}/createPost`, post);
+
+export const updatePost = (id: string, post: PostStateInterface) =>
+  axios.patch(`${url}/${id}`, post);
+
+export const deletePost = (id: string) => 
+  axios.delete(`${url}/${id}`)
+
+export const likePost = (id: string) => 
+  axios.patch(`${url}/${id}/likePost`)
