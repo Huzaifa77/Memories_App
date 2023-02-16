@@ -1,32 +1,80 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import ReactImageFileToBase64 from "react-file-image-to-base64";
-import { useDispatch } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { PostStateInterface } from "../../interfaces/post_interface";
-import { sendPostsThunk } from "../../reducers/postSlice";
-import type { AppDispatch } from "../../store/store";
+import {
+  postSelector,
+  sendPostsThunk,
+  updatePostThunk
+} from "../../reducers/postSlice";
+import type { AppDispatch, RootState } from "../../store/store";
 
-const Form = () => {
+type formType = {
+  currentId: string;
+  setCurrentId: React.Dispatch<React.SetStateAction<string>>;
+};
+
+const initialPostData = {
+  creator: "",
+  title: "",
+  message: "",
+  tags: "",
+  selectedFile: "",
+  likeCount: 0,
+  createdAt: new Date(),
+};
+
+const Form: React.FC<formType> = ({ currentId, setCurrentId }) => {
+
+
   const dispatch: AppDispatch = useDispatch();
-  const [uploadedImage, setUploadImage] = useState('Choosen Image...')
-  const [postData, setPostData] = useState<PostStateInterface>({
-    creator: "",
-    title: "",
-    message: "",
-    tags: "",
-    selectedFile: "",
-  });
+  
+  const [uploadedImage, setUploadImage] = useState("Choosen Image...");
+  const [postData, setPostData] = useState<PostStateInterface>(initialPostData);
+
+  const allPosts = useSelector(postSelector);
+
+  const editablePost: PostStateInterface | null = currentId
+    ? allPosts.posts.find((post) => post._id === currentId)!
+    : null;
+
+  useEffect(() => {
+    if (editablePost) setPostData(editablePost);
+  }, [editablePost]);
 
   const handleSubmit = (e: React.SyntheticEvent) => {
     e.preventDefault();
-    dispatch(sendPostsThunk(postData)); 
+    if (currentId) {
+      dispatch(updatePostThunk({ currentId, postData }));
+
+    } else {
+      dispatch(sendPostsThunk(postData));
+    }
+    clear();
   };
 
-  const clear = () => {};
+  const handleImageFiles = (files: any) => {
+    setPostData({ ...postData, selectedFile: files[0].base64_file });
+    setUploadImage(files[0].file_name);
+  };
 
-  const handleFiles = (files: any)=> {
-    setPostData({...postData,selectedFile: files[0].base64_file})
-    setUploadImage(files[0].file_name)
-  }
+  const clear = () => {
+    setCurrentId('');
+    setPostData(initialPostData)
+  };
+
+  const changeState = ({target: { name, value }}: React.ChangeEvent<HTMLInputElement>) => {
+    // setPostData((prev) => {
+    //   (prev as any)[name] = value;
+    //   const newValue = { ...prev };
+    //   return newValue;
+    // });  
+    setPostData((prev) => {
+      const newValue:any = {...prev}
+      newValue[name] = value
+      return newValue
+    })
+  };
 
   return (
     <div className="w-full max-w-xs">
@@ -35,44 +83,44 @@ const Form = () => {
         onSubmit={handleSubmit}
       >
         <div className="font-bold text-blue-500 items-center mb-3">
-          Creating a memory
+          {currentId ? 'Editing' : 'Creating'}  a memory
         </div>
         <input
           type="text"
+          name="creator"
           value={postData.creator}
           placeholder="Creator"
           className="block text-gray-700 text-sm border-2 mb-3 my-1"
-          onChange={(e) =>
-            setPostData({ ...postData, creator: e.target.value })
-          }
+          onChange={(e) => changeState(e)}
         ></input>
         <input
           type="text"
+          name="title"
           value={postData.title}
           placeholder="Title"
           className="block text-gray-700 text-sm border-2 mb-3 my-1"
-          onChange={(e) => setPostData({ ...postData, title: e.target.value })}
+          onChange={(e) => changeState(e)}
         ></input>
         <input
           type="text"
+          name="message"
           value={postData.message}
           placeholder="Message"
           className="block text-gray-700 text-sm border-2 mb-3 my-1"
-          onChange={(e) =>
-            setPostData({ ...postData, message: e.target.value })
-          }
+          onChange={(e) => changeState(e)}
         ></input>
         <input
           type="text"
+          name="tags"
           value={postData.tags}
           placeholder="Tags"
           className="block text-gray-700 text-sm border-2 mb-3 my-1"
-          onChange={(e) => setPostData({ ...postData, tags: e.target.value })}
+          onChange={(e) => changeState(e)}
         ></input>
         <div className="my-5">
           <ReactImageFileToBase64
             multiple={false} // MULTIPLE IS SET TO FALSE BY DEFAULT, SO FEEL FREE TO REMOVE THIS  CHUNK IF YOU WANT
-            onCompleted={handleFiles}
+            onCompleted={handleImageFiles}
             preferredButtonText="Click Me !"
           />
           <div className="inline-block ml-2 max-w-xs">{uploadedImage}</div>

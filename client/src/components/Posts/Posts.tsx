@@ -1,11 +1,15 @@
 import { useEffect, useLayoutEffect, useState } from "react";
 import { shallowEqual, useDispatch, useSelector } from "react-redux";
-import { PostsState, PostStateInterface } from "../../interfaces/post_interface";
+import { PostStateInterface } from "../../interfaces/post_interface";
 import { getPosts, postSelector } from "../../reducers/postSlice";
 import type { AppDispatch } from "../../store/store";
 import Post from "./Post/Post";
 
-function Posts() {
+type propsType = {
+  setCurrentId: React.Dispatch<React.SetStateAction<string>>
+}
+
+const Posts: React.FC<propsType> = ( {setCurrentId} ) => {
   const dispatch: AppDispatch = useDispatch();
   const { posts, loading } = useSelector(postSelector);
 
@@ -27,9 +31,9 @@ function Posts() {
       ) : (
         <div className="container px-1 mt-2">
           <div className="flex flex-wrap justify-between">
-          {allPosts.map((post: PostStateInterface) => (
-            <Post key={post?.id} {...post} />
-          ))}
+            {allPosts.map((post: PostStateInterface) => (
+              <Post key={post?._id} post={post} setCurrentId={setCurrentId}/>
+            ))}
           </div>
         </div>
       )}
