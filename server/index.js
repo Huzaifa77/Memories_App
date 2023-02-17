@@ -1,11 +1,13 @@
 import bodyParser from "body-parser";
 import cors from "cors";
+import dotenv from 'dotenv';
 import express from "express";
 import mongoose from "mongoose";
-import morgan from "morgan";
 import postRouter from "./routes/posts.js";
 
 const app = express();
+
+dotenv.config();
 
 
 app.use(bodyParser.json({ limit: "30mb"}));
@@ -15,7 +17,7 @@ app.use(cors());
 app.use('/posts',postRouter)
 
 const CONNECTION_URL =
-  "mongodb+srv://huzzu:vegeta7z@test-cluster-1.7l5gg.mongodb.net/?retryWrites=true&w=majority";
+  `mongodb+srv://${process.env.DB_USERNAME}:${process.env.DB_PASSWORD}@test-cluster-1.7l5gg.mongodb.net/?retryWrites=true&w=majority`;
 
 const PORT = process.env.port || 5000;
 
