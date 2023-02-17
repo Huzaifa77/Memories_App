@@ -22,11 +22,11 @@ function App() {
           </li>
         </ul>
       </nav>
-      <div className="flex flex-row justify-between mt-10">
-        <div className="justify-start ml-2">
+      <div className="flex md:flex-row md:flex-nowrap sm:flex-wrap sm:flex-col-reverse justify-between mt-10">
+        <div className="md:justify-start ml-2">
           <Posts setCurrentId = {setCurrentId}/>
         </div>
-        <div className="justify-end mr-2 mt-5">
+        <div className="md:justify-end sm:place-self-center md:mr-2 md:mt-5">
           <Form currentId={currentId} setCurrentId={setCurrentId} />
         </div>
       </div>

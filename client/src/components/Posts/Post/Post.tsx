@@ -33,7 +33,7 @@ const Post: React.FC<postTypes> = ({post,setCurrentId}) => {
   }
 
   return (
-    <div className="bg-white rounded-lg md:w-2/5 w-2/5 mx-5 mb-2 ">
+    <div className="bg-white rounded-lg sm:4/6 md:w-4/6 lg:w-2/6 mx-5 mb-8 ">
       <div className="relative z-0">
         <img
           className="w-fit h-auto mb-3 shadow-lg rounded-lg"
@@ -76,17 +76,17 @@ const Post: React.FC<postTypes> = ({post,setCurrentId}) => {
         </span>
       </div>
 
-      <div className="flex flex-col items-start px-4">
-        <h5 className="mb-1 text-xl font-medium text-gray-900 dark:text-white">
+      <div className="flex flex-col items-start">
+        <h5 className="mb-1 text-xl font-medium text-gray-900 dark:text-white px-4">
           {post.title}
         </h5>
-        <span className="text-md text-gray-500 dark:text-gray-400">
+        <span className="text-md text-gray-500 dark:text-gray-400 pl-4 mb-3">
           {post.message}
         </span>
 
-        <div className="grid grid-cols-2 gap-10 mt-2 mb-2">
-          <div>
-            <button onClick={() => handleLike(post._id!)} className="flex hover:text-blue-500">
+        <div className="grid grid-flow-col grid-cols-2 mb-3 w-11/12">
+          <div className="place-self-start pl-4">
+            <button onClick={() => handleLike(post._id!)} className="flex text-blue-500 hover:text-blue-700">
               <svg
                 xmlns="http://www.w3.org/2000/svg"
                 viewBox="0 0 24 24"
@@ -99,8 +99,8 @@ const Post: React.FC<postTypes> = ({post,setCurrentId}) => {
               <p className=" ml-1 inline">{post.likeCount}</p>
             </button>
           </div>
-          <div>
-            <button onClick={() => handleDelete(post._id!)} className="flex hover:text-red-600">
+          <div className="place-self-end">
+            <button onClick={() => handleDelete(post._id!)} className="flex text-red-500 hover:text-red-700">
               <svg
                 xmlns="http://www.w3.org/2000/svg"
                 viewBox="0 0 24 24"
